@@ -1,95 +1,11 @@
 #-*-coding:utf8;-*-
 
-import random
-import os
-from PIL import Image
-
-path = os.path.dirname(__file__)
-#path_trim = path + '/test/trim/'
-path_trim = path + '/trim/'
-
-FACE_LIST = ['chin',
-            'chin_wrinkle',
-            'front',
-            'neck',
-            'forehead',
-            'left_eye',
-            'left_eyebow',
-            'left_eyelip',
-            'right_eye',
-            'right_eyebow',
-            'right_eyelip',
-            'up_lip',
-            'down_lip',
-            'nose',
-            'left_ear',
-            'right_ear']
-
-def parts_preload():
-    """
-    Презагружает все составные части и возвращает словарь
-    формата {'part': экземпляр класса изображения}
-    """
-    return {item: Image.open(path_trim + item + '.png') for item in FACE_LIST}
-
-
-class FaceImage(object):
-    def prop(self):
-        self.size = self.image.size
-        self.w, self.h = self.size
-        self.center = (self.image.size[0]/2, self.image.size[1]/2)
-        self.top_center = (self.image.size[0]/2, 0)
-        self.bottom_center = (self.image.size[0]/2, self.image.size[1])
-        self.left_center = (0, self.image.size[1]/2)
-        self.right_center = (self.image.size[0], self.image.size[1]/2)
-        self.image.load()
-    def __init__(self, image):
-        try:
-            self.image = Image.open(image)
-        except:
-            print "No image in FaceImage.class"
-    def show(self):
-        self.image.show()
-        self.prop()
-    def save(self, path):
-        self.image.save(path)
+from Classes import FacePart
+from variables import *
 
 
 
-
-class FacePart(FaceImage):
-    def __init__(self, image, name):
-        super(FacePart, self).__init__(image)
-        self.name = name
-        self.image.load()
-        self.prop()
-
-    def resize(self,w,h):
-        self.image = self.image.resize((w,h), Image.BICUBIC)
-        self.prop()
-
-    def rotate(self, angle):
-        self.image = self.image.rotate(angle, expand=True)
-        self.prop()
-
-
-
-
-class Background(FaceImage):
-    def __init__(self):
-        #Размер бэкграунда взят с потолка, потом уточнить
-        self.bc_w = 1000
-        self.bc_h = 1000
-        super(Background, self).__init__(self)
-        self.image =  Image.new('RGBA', (self.bc_w, self.bc_h), (220, 220, 220, 255))
-        self.prop()
-
-    def paste(self, pasted, (x,y)):
-        self.image.paste(pasted.image, (x,y), mask = pasted.image.split()[3])
-        self.prop()
-
-
-def Face_Parts_preload():
+def face_parts_preload():
     """
     Презагружает все составные части и возвращает словарь
     формата {'part': экземпляр класса изображения}
@@ -97,63 +13,10 @@ def Face_Parts_preload():
     return {item: FacePart(path_trim + item + '.png', item) for item in FACE_LIST}
 
 
-face_dict = Face_Parts_preload()
-background = Background()
-
-face_w_c = 1
-
-forehead_h_c = 1
-front_h_c = 1
-chin_h_c = 1
-
-nose_h_c = 1
-nose_w_c = 1
-nose_front_gap_c = 0.1
-
-
-left_eye_h_c = 1
-left_eye_w_c = 1
-left_eye_angle = 0
-left_eye_front_gap_c = 0.1
-right_eye_h_c = 1
-right_eye_w_c = 1
-right_eye_angle = 0
-right_eye_front_gap_c = 0.1
-eye_distance_front_c = 0.45
-
-right_eyebow_w_c = 1
-right_eyebow_h_c = 1
-right_eyebow_angle = 0
-right_eyebow_eye_distance_c = 1
-left_eyebow_w_c = 1
-left_eyebow_h_c = 1
-left_eyebow_angle = 0
-left_eyebow_eye_distance_c = 1
-
-left_eyelip_h_c = 1
-left_eyelip_eye_gap = 0.5
-right_eyelip_h_c = 1
-right_eyelip_eye_gap = 0.5
-
-up_lip_h_c = 1
-up_lip_w_c = 1
-down_lip_h_c = 1
-down_lip_w_c = 1
-lips_chin_gap = 1
-lips_gap = 0.1
-
-
-left_ear_w_c = 1
-left_ear_h_c = 1
-left_ear_attach_c = 1
-left_ear_front_c = 0.1
-right_ear_w_c = 1
-right_ear_h_c = 1
-right_ear_attach_c = 1
-right_ear_front_c = 0.1
-
-
-def assembly(background, list_of_pasted):
+def assembly(background, face_dict, list_of_pasted):
+    """
+    Собирает лицо, изменяя части в соотвествии с коэффициентами
+    """
     gap = 50
     for part in list_of_pasted:
         if part.name == 'forehead':
@@ -256,51 +119,3 @@ def assembly(background, list_of_pasted):
             (x, y) = (background.center[0] - int(part.center[0] * right_ear_attach_c) + face_dict['front'].w/2 ,
                         face_dict['forehead'].h + int(face_dict['front'].h * right_ear_front_c)+ gap)
             background.paste(part, (x, y))
-
-
-
-
-
-assembly(background, [face_dict['forehead'],
-                        face_dict['front'],
-                        face_dict['chin'],
-                        face_dict['nose'],
-                        face_dict['left_eye'],
-                        face_dict['right_eye'],
-                        face_dict['left_eyebow'],
-                        face_dict['right_eyebow'],
-                        face_dict['left_eyelip'],
-                        face_dict['right_eyelip'],
-                        face_dict['up_lip'],
-                        face_dict['down_lip'],
-                        face_dict['left_ear'],
-                        face_dict['right_ear']])
-
-background.show()
-background.save('test.png')
-
-##t = face_dict['nose']
-##
-##
-##print t.size
-##
-##t.rotate(58)
-##
-##
-##print t.size
-
-
-##t = face_dict['nose'].image.rotate(45, expand=True)
-##
-##t.save('rote.png')
-
-
-
-##        try:
-##        if pasted.name == 'chin':
-##            (x, y) = (self.center[0] - pasted.center[0], self.bc_h/2 - pasted.h)
-##        else:
-##            print 'Not chin'
-
-##        self.image.paste(pasted.image, (x,y), mask = pasted.image.split()[3])
-
