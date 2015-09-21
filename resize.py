@@ -51,6 +51,8 @@ class FaceImage(object):
     def show(self):
         self.image.show()
         self.prop()
+    def save(self, path):
+        self.image.save(path)
 
 
 
@@ -66,7 +68,11 @@ class FacePart(FaceImage):
     def resize(self,w,h):
         self.image = self.image.resize((w,h), Image.BICUBIC)
         self.prop()
-        #self.size = self.image.size
+
+    def rotate(self, angle):
+        self.image = self.image.rotate(angle, expand=True)
+        self.prop()
+
 
 
 
@@ -76,19 +82,10 @@ class Background(FaceImage):
         self.bc_h = 1000
         super(Background, self).__init__(self)
         self.image =  Image.new('RGBA', (self.bc_w, self.bc_h), (220, 220, 220, 255))
-
         self.prop()
 
     def paste(self, pasted, (x,y)):
-##        try:
-##            if pasted.name == 'chin':
-##                (x, y) = (self.center[0] - pasted.center[0], self.bc_h/2 - pasted.h)
-##            else:
-##                print 'Not chin'
-
         self.image.paste(pasted.image, (x,y), mask = pasted.image.split()[3])
-##        except:
-##            print 'Image should be .load() first'
         self.prop()
 
 
@@ -114,11 +111,20 @@ forehead_h_c = 1
 front_h_c = 1
 chin_h_c = 1
 
-nose_h_c = 100
+nose_h_c = 1
 nose_w_c = 1
-
 nose_front_gap_c = 0.1
 
+
+left_eye_h_c = 1
+left_eye_w_c = 1
+left_eye_angle = 0
+left_eye_front_gap_c = 0.1
+right_eye_h_c = 1
+right_eye_w_c = 1
+right_eye_angle = 0
+right_eye_front_gap_c = 0.1
+eye_distance_front_c = 0.5
 
 
 def pasting(background, list_of_pasted):
@@ -141,6 +147,7 @@ def pasting(background, list_of_pasted):
             background.paste(part, (x, y))
 
         if part.name == 'nose':
+            #Проверка чтобы нос не вышел за границы лица, можно потом улучшить коэффициенты
             if part.h * nose_h_c > face_dict['front'].h * front_h_c * 0.8:
                 this_part_h = face_dict['front'].h * front_h_c * 0.8 #Чтобы нос не вышел за границы лица,
                                                             #можно потом улучшить
@@ -150,16 +157,50 @@ def pasting(background, list_of_pasted):
             part.resize(int(part.w * nose_w_c), int(this_part_h))
             (x, y) = (background.center[0] - part.center[0],
                         face_dict['forehead'].h + int(face_dict['front'].h * nose_front_gap_c)  + gap)
+            background.paste(part, (x, y))
 
+        if part.name == 'left_eye':
+            part.resize(int(part.w * face_w_c), int(part.h * chin_h_c))
+            part.rotate(left_eye_angle)
+            (x, y) = (background.center[0] - part.center[0] - int(face_dict['front'].w * eye_distance_front_c/2),
+                        face_dict['forehead'].h + int(face_dict['front'].h * left_eye_front_gap_c )  + gap)
+            background.paste(part, (x, y))
+
+        if part.name == 'right_eye':
+            part.resize(int(part.w * face_w_c), int(part.h * chin_h_c))
+            part.rotate(right_eye_angle)
+            (x, y) = (background.center[0] - part.center[0] + int(face_dict['front'].w * eye_distance_front_c/2),
+                        face_dict['forehead'].h + int(face_dict['front'].h * right_eye_front_gap_c )  + gap)
             background.paste(part, (x, y))
 
 
 
 
 
-pasting(background, [face_dict['forehead'], face_dict['front'],face_dict['chin'], face_dict['nose']])
+
+pasting(background, [face_dict['forehead'],
+                        face_dict['front'],
+                        face_dict['chin'],
+                        face_dict['nose'],
+                        face_dict['left_eye'],
+                        face_dict['right_eye']])
 
 background.show()
+
+##t = face_dict['nose']
+##
+##
+##print t.size
+##
+##t.rotate(58)
+##
+##
+##print t.size
+
+
+##t = face_dict['nose'].image.rotate(45, expand=True)
+##
+##t.save('rote.png')
 
 
 
