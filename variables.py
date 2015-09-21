@@ -4,7 +4,7 @@
 import os
 
 path = os.path.dirname(__file__)
-path_trim = path + '/trim/'
+path_trim = path + '/Trim/'
 
 FACE_LIST = ['chin',
             'chin_wrinkle',
