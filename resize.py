@@ -109,9 +109,16 @@ background = Background()
 #background.paste(chin)
 
 face_w_c = 1
+
 forehead_h_c = 1
 front_h_c = 1
 chin_h_c = 1
+
+nose_h_c = 100
+nose_w_c = 1
+
+nose_front_gap_c = 0.1
+
 
 
 def pasting(background, list_of_pasted):
@@ -120,25 +127,38 @@ def pasting(background, list_of_pasted):
         if part.name == 'forehead':
             part.resize(int(part.w * face_w_c), int(part.h * forehead_h_c))
             (x, y) = (background.center[0] - part.center[0], gap)
-
             background.paste(part, (x, y))
 
         if part.name == 'front':
             part.resize(int(part.w * face_w_c), int(part.h * front_h_c))
             (x, y) = (background.center[0] - part.center[0], face_dict['forehead'].h + gap)
-
             background.paste(part, (x, y))
 
         if part.name == 'chin':
             part.resize(int(part.w * face_w_c), int(part.h * chin_h_c))
             (x, y) = (background.center[0] - part.center[0],
-            face_dict['forehead'].h + face_dict['front'].h + gap)
+                        face_dict['forehead'].h + face_dict['front'].h + gap)
+            background.paste(part, (x, y))
+
+        if part.name == 'nose':
+            if part.h * nose_h_c > face_dict['front'].h * front_h_c * 0.8:
+                this_part_h = face_dict['front'].h * front_h_c * 0.8 #Чтобы нос не вышел за границы лица,
+                                                            #можно потом улучшить
+            else:
+                this_part_h = part.h * nose_h_c
+
+            part.resize(int(part.w * nose_w_c), int(this_part_h))
+            (x, y) = (background.center[0] - part.center[0],
+                        face_dict['forehead'].h + int(face_dict['front'].h * nose_front_gap_c)  + gap)
 
             background.paste(part, (x, y))
 
 
 
-pasting(background, [face_dict['forehead'], face_dict['front'],face_dict['chin']])
+
+
+pasting(background, [face_dict['forehead'], face_dict['front'],face_dict['chin'], face_dict['nose']])
+
 background.show()
 
 
