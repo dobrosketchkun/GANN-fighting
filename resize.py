@@ -79,18 +79,17 @@ class Background(FaceImage):
 
         self.prop()
 
-    def paste(self, pasted):
+    def paste(self, pasted, (x,y)):
 ##        try:
-            if pasted.name == 'chin':
-                (x, y) = (self.center[0] - pasted.center[0], self.bc_h/2 - pasted.h)
-            else:
-                print 'Not chin'
+##            if pasted.name == 'chin':
+##                (x, y) = (self.center[0] - pasted.center[0], self.bc_h/2 - pasted.h)
+##            else:
+##                print 'Not chin'
 
-
-            self.image.paste(pasted.image, (x,y), mask = pasted.image.split()[3])
+        self.image.paste(pasted.image, (x,y), mask = pasted.image.split()[3])
 ##        except:
 ##            print 'Image should be .load() first'
-##        self.prop()
+        self.prop()
 
 
 def Face_Parts_preload():
@@ -102,11 +101,53 @@ def Face_Parts_preload():
 
 face_dict = Face_Parts_preload()
 
-
+#CHIN_X = 'chin_x = self.center[0] - pasted.center[0]'
 
 background = Background()
-chin = face_dict['chin']
+#chin = face_dict['chin']
 
-background.paste(chin)
+#background.paste(chin)
 
+face_w_c = 1
+forehead_h_c = 1
+front_h_c = 1
+chin_h_c = 1
+
+
+def pasting(background, list_of_pasted):
+    gap = 50
+    for part in list_of_pasted:
+        if part.name == 'forehead':
+            part.resize(int(part.w * face_w_c), int(part.h * forehead_h_c))
+            (x, y) = (background.center[0] - part.center[0], gap)
+
+            background.paste(part, (x, y))
+
+        if part.name == 'front':
+            part.resize(int(part.w * face_w_c), int(part.h * front_h_c))
+            (x, y) = (background.center[0] - part.center[0], face_dict['forehead'].h + gap)
+
+            background.paste(part, (x, y))
+
+        if part.name == 'chin':
+            part.resize(int(part.w * face_w_c), int(part.h * chin_h_c))
+            (x, y) = (background.center[0] - part.center[0],
+            face_dict['forehead'].h + face_dict['front'].h + gap)
+
+            background.paste(part, (x, y))
+
+
+
+pasting(background, [face_dict['forehead'], face_dict['front'],face_dict['chin']])
 background.show()
+
+
+
+##        try:
+##        if pasted.name == 'chin':
+##            (x, y) = (self.center[0] - pasted.center[0], self.bc_h/2 - pasted.h)
+##        else:
+##            print 'Not chin'
+
+##        self.image.paste(pasted.image, (x,y), mask = pasted.image.split()[3])
+
