@@ -24,4 +24,4 @@ assembly(background, face_dict,
                     face_dict['right_ear']])
 
 background.show()
-#background.save('test.png')
+background.save('test.png')
