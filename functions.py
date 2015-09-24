@@ -1,6 +1,7 @@
 #-*-coding:utf8;-*-
 
-from Classes import FacePart
+import random
+from Classes import FacePart, Background
 from variables import *
 
 
@@ -119,3 +120,8 @@ def assembly(background, face_dict, list_of_pasted):
             (x, y) = (background.center[0] - int(part.center[0] * right_ear_attach_c) + face_dict['front'].w/2 ,
                         face_dict['forehead'].h + int(face_dict['front'].h * right_ear_front_c)+ gap)
             background.paste(part, (x, y))
+
+
+
+
+
