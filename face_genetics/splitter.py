@@ -37,7 +37,7 @@ def all_xselections(items, n2, n1 = 1):
 
 
 #divider = all_xselections(['0','1'], 8, 7)
-divider = ["".join(t) for t in xselections(['0','1'], 2)]
+divider = ["".join(t) for t in xselections(['0','1'], 9)]
 
 
 
@@ -79,11 +79,11 @@ def split_length(divider, times = 100000):
 
     #plt.plot(n,rez, 'ro')
     plt.plot(range(len(divider)), tlens, 'bo')
-    plt.plot(x, y,'g:', markersize=100)
+    plt.plot(x, y,'r--', markersize=100)
 
 
     plt.show()
 
 
-split_length(divider, times = int(10E4))
+split_length(divider, times = int(5*10E3))
 
