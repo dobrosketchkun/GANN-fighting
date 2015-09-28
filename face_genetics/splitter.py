@@ -2,7 +2,10 @@
 # -*- coding: UTF-8 -*-
 from __future__ import generators
 import random
+import numpy
 
+def median(lst):
+    return numpy.median(numpy.array(lst))
 
 
 def xselections(items, n):
@@ -34,14 +37,16 @@ def all_xselections(items, n2, n1 = 1):
 
 
 #divider = all_xselections(['0','1'], 8, 7)
-divider = ["".join(t) for t in xselections(['0','1'], 9)]
+divider = ["".join(t) for t in xselections(['0','1'], 2)]
 
 
 
-def split_length(divider, times = 10000):
+def split_length(divider, times = 100000):
 
     rez = []
     n = []
+    tlens = []
+
     for item in divider:
 
         #times = 10000
@@ -52,6 +57,7 @@ def split_length(divider, times = 10000):
             test += str(random.randint(0, 1))
 
         t = test.split(item)
+        tlens.append(len(t))
         sum = 0
         for num in t:
            sum += len(num)
@@ -61,17 +67,23 @@ def split_length(divider, times = 10000):
         rez.append(str(sred))
         n.append(str(int(item,2)))
 
-    print rez
-    print n
+    #print rez
+    #print n
+    print tlens
 
 
     from matplotlib import pyplot as plt
     import numpy as np
+    x = range(len(divider))
+    y =  [median(tlens) for i in range(len(divider))]
 
-    plt.plot(n,rez, 'ro')
+    #plt.plot(n,rez, 'ro')
+    plt.plot(range(len(divider)), tlens, 'bo')
+    plt.plot(x, y,'g:', markersize=100)
 
 
     plt.show()
 
 
+split_length(divider, times = int(10E4))
 
