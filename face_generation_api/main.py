@@ -27,4 +27,4 @@ background = Background()
 ##background.show()
 ##background.save('test.png')
 
-random_face(5)
+random_face(6)

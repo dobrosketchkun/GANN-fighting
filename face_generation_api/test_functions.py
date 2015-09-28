@@ -18,7 +18,7 @@ def face_parts_preload():
 def random_face(times):
     count = 0
 
-    for value in range(10):
+    for value in range(times):
 
         face_dict = face_parts_preload()
         background = Background()
